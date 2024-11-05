@@ -1,40 +1,44 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
-import { SaleContractAbi__factory } from "../../services/contracts/sale/factories/SaleContractAbi__factory";
-import { SaleContractAbi } from "../../services/contracts/sale/SaleContractAbi";
 
-import { useGetContract } from ".";
-import { IContractAbiFactory } from "./types";
+
+import { useGlobalProvider } from "../provider/useGlobalProvider";
+import { Account, Provider } from "fuels";
+import { SaleContract } from "../../services/contracts/sale";
 
 interface Props {
-  contractId: string | undefined;
+  contractId?: string;
   defaultProvider?: boolean;
 }
 
 export interface UseSaleContractResult {
-  contract: SaleContractAbi | undefined;
+  contract: SaleContract | undefined;
 }
 
 export function useSaleContract({
   contractId = "",
   defaultProvider = false,
 }: Props): UseSaleContractResult {
-  const contractRef = useRef<SaleContractAbi | undefined>(undefined);
+  const { provider: globalProvider } = useGlobalProvider();
+  const contractRef = useRef<SaleContract | undefined>(undefined);
+  
+  useEffect(() => {
+    const walletOrProvider: Account | Provider | undefined = globalProvider;
+  
+    if (!walletOrProvider) return;
 
-  const { contract } = useGetContract<SaleContractAbi>({
-    contractId,
-    contractAbiFactory:
-      SaleContractAbi__factory as unknown as IContractAbiFactory<SaleContractAbi>,
-    defaultProvider,
-  });
+    if (!walletOrProvider || !contractId) return;
 
-  if (!contractRef.current && contract) {
-    contractRef.current = contract;
-  } else if (
-    contract?.account?.address &&
-    !contractRef.current?.account?.address.equals(contract?.account?.address)
-  ) {
-    contractRef.current = contract;
-  }
+    const newContract = new SaleContract(contractId, walletOrProvider);
+    console.log("SALE CONTRACT", newContract);
+
+    if (
+      !contractRef.current ||
+      contractRef.current.account?.address !== newContract.account?.address
+    ) {
+      contractRef.current = newContract;
+    }
+  }, [contractId, globalProvider, defaultProvider]);
+
   return { contract: contractRef.current };
 }
