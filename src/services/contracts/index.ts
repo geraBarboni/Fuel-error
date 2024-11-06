@@ -6,7 +6,9 @@
 
 /*
   Fuels version: 0.96.1
+  Forc version: 0.66.4
+  Fuel-Core version: 0.40.0
 */
 
-export { SaleContract } from "./SaleContract";
-export { SaleContractFactory } from "./SaleContractFactory";
+export { SaleContract } from './SaleContract';
+export { SaleContractFactory } from './SaleContractFactory';

@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 
 import { useGlobalProvider } from "../provider/useGlobalProvider";
 import { Account, Provider } from "fuels";
-import { SaleContract } from "../../services/contracts/sale";
+import { SaleContract } from "../../services/contracts";
 
 interface Props {
   contractId?: string;
